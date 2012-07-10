@@ -1,6 +1,7 @@
 package hu.bme.inf.mit.neo4jmapping;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 
 import org.neo4j.graphdb.Transaction;
@@ -18,16 +19,18 @@ public class Neo4jTestBed {
 
 	private String databasePath;
 
-	public Neo4jTestBed(String databasePath, boolean deletePrevious) {
+	public Neo4jTestBed(String databasePath, boolean deletePrevious) throws IOException {
 		this.databasePath = databasePath;
-		
+
 		// deleting test database directory
-		if (deletePrevious) {
+		if (new File(databasePath).exists() && deletePrevious) {
 			try {
 				FileUtils.deleteRecursively(new File(databasePath));
-				System.out.println("testdb directory deleted.");
-			} catch (Exception e) {
+				System.out.println("Database directory deleted.");
+			} catch (IOException e) {
 				e.printStackTrace();
+				System.out.println("Cannot delete database directory.");
+				throw e;
 			}
 		}	
 	}
@@ -38,27 +41,29 @@ public class Neo4jTestBed {
 	
 	public void runTest() {
 		try {
-			System.out.println("Starting database.");    // ----------------------------------------
+			System.out.println("Starting database.");
 		    graphDatabaseAPI = new EmbeddedGraphDatabase(databasePath);
+		    System.out.println("Database started.");
 		    GraphDatabase graphDatabase = new DelegatingGraphDatabase(graphDatabaseAPI);
 		    transactionManager = new JtaTransactionManager(new SpringTransactionManager(graphDatabaseAPI));
-		    template = new Neo4jTemplate(graphDatabase, transactionManager);
+		    template = new Neo4jTemplate(graphDatabase, transactionManager);		    
 		    
-		    System.out.println("Starting transaction."); // ----------------------------------------
+		    System.out.println("Starting transaction.");
 		    loadData();
-		    System.out.println("Transaction finished."); // ----------------------------------------
+		    System.out.println("Transaction finished.");
 		    
-		    System.out.println("Query started.");        // ----------------------------------------
+		    System.out.println("Query started.");
 		    Neo4jQueryExecutor neo4jQueryExecutor = new Neo4jQueryExecutor(template);
 		    neo4jQueryExecutor.executeQuery();
-		    System.out.println("Query finished.");       // ----------------------------------------			
+		    System.out.println("Query finished.");	
+		    
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 		    if (graphDatabaseAPI != null) {
 		    	graphDatabaseAPI.shutdown();
 		    }
-		    System.out.println("Database shutdown.");    // ----------------------------------------
+		    System.out.println("Database shutdown.");
 		}
 	}
 
