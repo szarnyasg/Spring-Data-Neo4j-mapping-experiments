@@ -10,7 +10,6 @@ import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.transaction.SpringTransactionManager;
 import org.neo4j.kernel.impl.util.FileUtils;
 import org.springframework.data.neo4j.conversion.EndResult;
-import org.springframework.data.neo4j.conversion.Result;
 import org.springframework.data.neo4j.core.GraphDatabase;
 import org.springframework.data.neo4j.support.DelegatingGraphDatabase;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
@@ -19,6 +18,7 @@ import org.springframework.transaction.jta.JtaTransactionManager;
 
 
 public class Neo4jMapping {
+
 
 	public static void main(String[] args) {
 		boolean deletePrevious = true;
@@ -68,17 +68,10 @@ public class Neo4jMapping {
 		    System.out.println("Transaction finished."); // ----------------------------------------
 		    
 		    System.out.println("Query started.");        // ----------------------------------------
-		    		    
-		    String queryText = "START n=node:__types__(className=\"Movie\") RETURN n";
-			EndResult<Movie> endResult = template.query(queryText, null).to(Movie.class);
+		    Neo4jQueryExecutor neo4jQueryExecutor = new Neo4jQueryExecutor(template);
 		    
-			Iterator<Movie> iter = endResult.iterator();
-			
-			while (iter.hasNext()) {
-				System.out.println(iter.next());
-			}
-			
-			System.out.println("Query finished.");       // ----------------------------------------			
+		    neo4jQueryExecutor.executeQuery();
+		    System.out.println("Query finished.");       // ----------------------------------------			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
