@@ -1,4 +1,4 @@
-package hu.bme.inf.mit.neo4jmapping;
+package hu.bme.mit.neo4jmapping;
 
 import java.util.Iterator;
 

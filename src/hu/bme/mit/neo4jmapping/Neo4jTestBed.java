@@ -1,4 +1,4 @@
-package hu.bme.inf.mit.neo4jmapping;
+package hu.bme.mit.neo4jmapping;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +10,7 @@ import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.transaction.SpringTransactionManager;
 import org.neo4j.kernel.impl.util.FileUtils;
 import org.springframework.data.neo4j.core.GraphDatabase;
+import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.data.neo4j.support.DelegatingGraphDatabase;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -70,7 +71,7 @@ public class Neo4jTestBed {
 	private void loadData() {
 	    Transaction tx = graphDatabaseAPI.beginTx();
 	    
-	    template.repositoryFor(Movie.class);
+	    GraphRepository<Movie> graphRepository = template.repositoryFor(Movie.class);
 	    
 	    Movie m1 = new Movie("Node 1", "Test 1");
 	    Movie m2 = new Movie("Node 2", "Test 2");
@@ -84,7 +85,7 @@ public class Neo4jTestBed {
 	    
 	    m1.m = movies;
 	    
-	    template.save(m1);
+	    graphRepository.save(m1);
 	    
 	    tx.success();
 	    tx.finish();		
