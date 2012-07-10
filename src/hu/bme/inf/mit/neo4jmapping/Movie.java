@@ -27,6 +27,8 @@ public class Movie {
     public String a;
     public String b;
     
+    public String toString() { return a + " // " + b; }
+    
     @Fetch
     @RelatedTo(type = "MOVIE_REF", direction = Direction.BOTH)
     public Set<Movie> m;    
