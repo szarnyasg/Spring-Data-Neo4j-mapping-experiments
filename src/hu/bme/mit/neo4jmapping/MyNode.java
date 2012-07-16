@@ -11,41 +11,48 @@ import org.springframework.data.neo4j.annotation.RelatedTo;
 
 @NodeEntity
 public class MyNode {
-    @GraphId
-    private Long id;
-    
-    public MyNode() { }
+	@GraphId
+	private Long id;
 
-    public MyNode(String a, int x) {
-    	this.a = a;
-    	this.x = x;
-    }
+	public MyNode() {
+	}
 
-    public String a;
-    public int x;
-    
-    public String toString() { return a + " // " + x; }
-    
-    @Fetch
-    @RelatedTo(type = "NODES", direction = Direction.BOTH)
-    public Set<MyNode> nodes;    
+	public MyNode(String a, int x) {
+		this.a = a;
+		this.x = x;
+	}
 
-    @Fetch
-    @RelatedTo(type = "NEXT_NODE", direction = Direction.BOTH)
-    MyNode nextNode;
-    
+	public String a;
+	public int x;
+
+	public String toString() {
+		return a + " // " + x;
+	}
+
+	@Fetch
+	@RelatedTo(type = "NODES", direction = Direction.BOTH)
+	public Set<MyNode> nodes;
+
+	@Fetch
+	@RelatedTo(type = "NEXT_NODE", direction = Direction.BOTH)
+	MyNode nextNode;
+
 	@Override
 	public int hashCode() {
-        return (id == null) ? x : id.hashCode();
+		return (id == null) ? x : id.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		MyNode other = (MyNode) obj;
-		if (id == null) return other.id == null;
-        return id.equals(other.id);
+		if (id == null)
+			return other.id == null;
+		return id.equals(other.id);
 	}
 }

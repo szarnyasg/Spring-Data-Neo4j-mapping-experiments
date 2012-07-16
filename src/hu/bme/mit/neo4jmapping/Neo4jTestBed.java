@@ -20,7 +20,8 @@ public class Neo4jTestBed {
 
 	private String databasePath;
 
-	public Neo4jTestBed(String databasePath, boolean deletePrevious) throws IOException {
+	public Neo4jTestBed(String databasePath, boolean deletePrevious)
+			throws IOException {
 		this.databasePath = databasePath;
 
 		// deleting test database directory
@@ -33,67 +34,67 @@ public class Neo4jTestBed {
 				System.out.println("Cannot delete database directory.");
 				throw e;
 			}
-		}	
+		}
 	}
-	
+
 	private GraphDatabaseAPI graphDatabaseAPI = null;
 	private PlatformTransactionManager transactionManager;
 	private Neo4jTemplate template;
-	
+
 	public void runTest() {
 		try {
 			System.out.println("Starting database.");
-		    graphDatabaseAPI = new EmbeddedGraphDatabase(databasePath);
-		    System.out.println("Database started.");
-		    GraphDatabase graphDatabase = new DelegatingGraphDatabase(graphDatabaseAPI);
-		    transactionManager = new JtaTransactionManager(new SpringTransactionManager(graphDatabaseAPI));
-		    template = new Neo4jTemplate(graphDatabase, transactionManager);		    
-		    
-		    System.out.println("Starting transaction.");
-		    loadData();
-		    System.out.println("Transaction finished.");
+			graphDatabaseAPI = new EmbeddedGraphDatabase(databasePath);
+			System.out.println("Database started.");
+			GraphDatabase graphDatabase = new DelegatingGraphDatabase(graphDatabaseAPI);
+			transactionManager = new JtaTransactionManager(new SpringTransactionManager(graphDatabaseAPI));
+			template = new Neo4jTemplate(graphDatabase, transactionManager);
+
+			System.out.println("Starting transaction.");
+			loadData();
+			System.out.println("Transaction finished.");
 		} catch (Throwable e) {
 			e.printStackTrace();
 		} finally {
-		    if (graphDatabaseAPI != null) {
-		    	graphDatabaseAPI.shutdown();
-		    }
-		    System.out.println("Database shutdown.");
+			if (graphDatabaseAPI != null) {
+				graphDatabaseAPI.shutdown();
+			}
+			System.out.println("Database shutdown.");
 		}
 	}
 
 	private void loadData() {
-	    Transaction tx = graphDatabaseAPI.beginTx();
-	    
-	    GraphRepository<MyNode> graphRepository = template.repositoryFor(MyNode.class);
-	    
-	    MyNode m0 = new MyNode("Node 0", 0);
-	    m0.nodes = new HashSet<MyNode>();
-   
-	    int linkedListLength = 500;
-	    int starLeafCount = 0;
-	    
- 		// linked list
-	    if (linkedListLength > 0) {
-		    MyNode lastMovie = m0;
-		    for (int i = 1; i < linkedListLength; i++) {
-		    	MyNode m = new MyNode("Linked list " + i, i);
-		    	lastMovie.nextNode = m;
-		    	lastMovie = m;
-		    }
-	    }
-	    
-	    // star graph
-	    if (starLeafCount > 0) {
-		    for (int i = 1; i < starLeafCount; i++) {
-		    	MyNode m = new MyNode("Star " + i, linkedListLength + i);
-		    	m0.nodes.add(m);
-		    }
-	    }
-	    
-	    graphRepository.save(m0);
-	    
-	    tx.success();
-	    tx.finish();		
+		Transaction tx = graphDatabaseAPI.beginTx();
+
+		GraphRepository<MyNode> graphRepository = template.repositoryFor(MyNode.class);
+
+		MyNode m0 = new MyNode("Node 0", 0);
+		m0.nodes = new HashSet<MyNode>();
+
+		int linkedListLength = 800;
+		int starLeafCount = 500;
+
+		// linked list
+		if (linkedListLength > 0) {
+			MyNode lastMovie = m0;
+			for (int i = 1; i < linkedListLength; i++) {
+				MyNode m = new MyNode("Linked list " + i, i);
+				lastMovie.nextNode = m;
+				lastMovie = m;
+			}
+		}
+
+		// star graph
+		if (starLeafCount > 0) {
+			for (int i = 1; i < starLeafCount; i++) {
+				MyNode m = new MyNode("Star " + i, linkedListLength + i);
+				m0.nodes.add(m);
+			}
+		}
+
+		graphRepository.save(m0);
+
+		tx.success();
+		tx.finish();
 	}
 }
