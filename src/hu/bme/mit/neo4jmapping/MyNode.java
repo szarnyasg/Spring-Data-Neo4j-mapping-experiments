@@ -10,32 +10,33 @@ import org.springframework.data.neo4j.annotation.NodeEntity;
 import org.springframework.data.neo4j.annotation.RelatedTo;
 
 @NodeEntity
-public class Movie {
+public class MyNode {
     @GraphId
     private Long id;
     
-    @Indexed
-    private String name;
-    
-    public Movie() { }
+    public MyNode() { }
 
-    public Movie(String a, String b) {
+    public MyNode(String a, int x) {
     	this.a = a;
-    	this.b = b;
+    	this.x = x;
     }
 
     public String a;
-    public String b;
+    public int x;
     
-    public String toString() { return a + " // " + b; }
+    public String toString() { return a + " // " + x; }
     
     @Fetch
-    @RelatedTo(type = "MOVIE_REF", direction = Direction.BOTH)
-    public Set<Movie> m;    
+    @RelatedTo(type = "NODES", direction = Direction.BOTH)
+    public Set<MyNode> nodes;    
+
+    @Fetch
+    @RelatedTo(type = "NEXT_NODE", direction = Direction.BOTH)
+    MyNode nextNode;
     
 	@Override
 	public int hashCode() {
-        return (id == null) ? 0 : id.hashCode();
+        return (id == null) ? x : id.hashCode();
 	}
 
 	@Override
@@ -43,8 +44,8 @@ public class Movie {
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
-		Movie other = (Movie) obj;
+		MyNode other = (MyNode) obj;
 		if (id == null) return other.id == null;
         return id.equals(other.id);
-    }
+	}
 }

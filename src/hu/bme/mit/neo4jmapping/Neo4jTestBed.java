@@ -52,13 +52,7 @@ public class Neo4jTestBed {
 		    System.out.println("Starting transaction.");
 		    loadData();
 		    System.out.println("Transaction finished.");
-		    
-		    System.out.println("Query started.");
-		    Neo4jQueryExecutor neo4jQueryExecutor = new Neo4jQueryExecutor(template);
-		    neo4jQueryExecutor.executeQuery();
-		    System.out.println("Query finished.");	
-		    
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		} finally {
 		    if (graphDatabaseAPI != null) {
@@ -71,21 +65,33 @@ public class Neo4jTestBed {
 	private void loadData() {
 	    Transaction tx = graphDatabaseAPI.beginTx();
 	    
-	    GraphRepository<Movie> graphRepository = template.repositoryFor(Movie.class);
+	    GraphRepository<MyNode> graphRepository = template.repositoryFor(MyNode.class);
 	    
-	    Movie m1 = new Movie("Node 1", "Test 1");
-	    Movie m2 = new Movie("Node 2", "Test 2");
-	    Movie m3 = new Movie("Node 3", "Test 3");
-	    Movie m4 = new Movie("Node 4", "Test 4");
+	    MyNode m0 = new MyNode("Node 0", 0);
+	    m0.nodes = new HashSet<MyNode>();
+   
+	    int linkedListLength = 500;
+	    int starLeafCount = 0;
 	    
-	    HashSet<Movie> movies = new HashSet<Movie>();
-	    movies.add(m2);
-	    movies.add(m3);
-	    movies.add(m4);
+ 		// linked list
+	    if (linkedListLength > 0) {
+		    MyNode lastMovie = m0;
+		    for (int i = 1; i < linkedListLength; i++) {
+		    	MyNode m = new MyNode("Linked list " + i, i);
+		    	lastMovie.nextNode = m;
+		    	lastMovie = m;
+		    }
+	    }
 	    
-	    m1.m = movies;
+	    // star graph
+	    if (starLeafCount > 0) {
+		    for (int i = 1; i < starLeafCount; i++) {
+		    	MyNode m = new MyNode("Star " + i, linkedListLength + i);
+		    	m0.nodes.add(m);
+		    }
+	    }
 	    
-	    graphRepository.save(m1);
+	    graphRepository.save(m0);
 	    
 	    tx.success();
 	    tx.finish();		
